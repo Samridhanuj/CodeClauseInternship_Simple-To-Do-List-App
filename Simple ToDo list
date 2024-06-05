@@ -1,0 +1,118 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
+
+# Function to add a task
+def add_task():
+    task = task_entry.get()
+    if task != "":
+        tasks_listbox.insert('', 'end', values=(task, 'Pending'))
+        task_entry.delete(0, tk.END)
+    else:
+        messagebox.showwarning("Warning", "You must enter a task.")
+
+# Function to mark a task as completed
+def mark_completed():
+    selected_item = tasks_listbox.selection()
+    if selected_item:
+        tasks_listbox.item(selected_item, values=(tasks_listbox.item(selected_item, 'values')[0], 'Completed'))
+    else:
+        messagebox.showwarning("Warning", "You must select a task.")
+
+# Function to delete completed tasks
+def delete_completed_tasks():
+    for item in tasks_listbox.get_children():
+        if tasks_listbox.item(item, 'values')[1] == 'Completed':
+            tasks_listbox.delete(item)
+
+# Function to edit a selected task
+def edit_task():
+    selected_item = tasks_listbox.selection()
+    if selected_item:
+        task_entry.delete(0, tk.END)
+        task_entry.insert(0, tasks_listbox.item(selected_item, 'values')[0])
+        add_task_button.config(text="Update Task", command=lambda: update_task(selected_item))
+    else:
+        messagebox.showwarning("Warning", "You must select a task to edit.")
+
+# Function to update a task
+def update_task(item):
+    task = task_entry.get()
+    if task != "":
+        tasks_listbox.item(item, values=(task, 'Pending'))
+        task_entry.delete(0, tk.END)
+        add_task_button.config(text="Add Task", command=add_task)
+    else:
+        messagebox.showwarning("Warning", "You must enter a task.")
+
+# Create the main application window
+root = tk.Tk()
+root.title("To-Do List")
+
+# Set the size of the window
+root.geometry("500x500")
+
+# Load the background image
+bg_label = tk.Label(root, bg="#f5f5f5")
+bg_label.place(relwidth=1, relheight=1)
+
+# Create a style
+style = ttk.Style()
+style.configure("TButton", font=("Helvetica", 12), padding=6)
+style.configure("TEntry", padding=6)
+style.configure("Treeview", font=("Helvetica", 14), rowheight=25)
+
+# Custom button styles
+style.configure("Add.TButton", background="#00BFFF", foreground="#000000")
+style.configure("Complete.TButton", background="#32CD32", foreground="#000000")
+style.configure("Delete.TButton", background="#FF4500", foreground="#FFFFFF")
+style.configure("Edit.TButton", background="#FFD700", foreground="#000000")
+
+# Add hover effects for buttons
+style.map("Add.TButton", background=[('active', '#009ACD')], foreground=[('active', '#000000')])
+style.map("Complete.TButton", background=[('active', '#228B22')], foreground=[('active', '#000000')])
+style.map("Delete.TButton", background=[('active', '#FF6347')], foreground=[('active', '#FFFFFF')])
+style.map("Edit.TButton", background=[('active', '#FFC125')], foreground=[('active', '#000000')])
+
+# Create a frame for the task entry and buttons
+input_frame = tk.Frame(root, bg="#f5f5f5")
+input_frame.pack(pady=20)
+
+# Create the entry widget for task input with some styling
+task_entry = ttk.Entry(input_frame, width=35, font=("Helvetica", 14))
+task_entry.grid(row=0, column=0, padx=10)
+
+# Add Task Button with styling
+add_task_button = tk.Button(input_frame, text="Add Task", command=add_task, bg="#00BFFF", fg="#000000", font=("Helvetica", 12), bd=0, highlightthickness=0)
+add_task_button.grid(row=0, column=1, padx=10)
+
+# Create a frame for the listbox and scrollbar
+list_frame = tk.Frame(root, bg="#f5f5f5")
+list_frame.pack(pady=20)
+
+# Listbox to display tasks with some styling
+columns = ('task', 'status')
+tasks_listbox = ttk.Treeview(list_frame, columns=columns, show='headings')
+tasks_listbox.heading('task', text='Task')
+tasks_listbox.heading('status', text='Status')
+tasks_listbox.pack(side=tk.LEFT, fill=tk.BOTH)
+
+# Scrollbar for the listbox
+scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=tasks_listbox.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+tasks_listbox.config(yscrollcommand=scrollbar.set)
+
+# Mark Completed Button with styling
+mark_completed_button = tk.Button(root, text="Mark as Complete", command=mark_completed, bg="#32CD32", fg="#000000", font=("Helvetica", 12), bd=0, highlightthickness=0)
+mark_completed_button.pack(pady=10)
+
+# Delete Completed Tasks Button with styling
+delete_completed_tasks_button = tk.Button(root, text="Delete complete task", command=delete_completed_tasks, bg="#FF4500", fg="#FFFFFF", font=("Helvetica", 12), bd=0, highlightthickness=0)
+delete_completed_tasks_button.pack(pady=10)
+
+# Edit Task Button with styling
+edit_task_button = tk.Button(root, text="Edit", command=edit_task, bg="#FFD700", fg="#000000", font=("Helvetica", 12), bd=0, highlightthickness=0)
+edit_task_button.pack(pady=10)
+
+# Run the Tkinter event loop
+root.mainloop()
